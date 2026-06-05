@@ -1,118 +1,874 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Deploy to GitHub Pages</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap');
-  *{margin:0;padding:0;box-sizing:border-box}
-  body{font-family:'DM Sans',sans-serif;background:#1a4d63;min-height:100vh;display:flex;align-items:center;justify-content:center;color:#fff}
-  .card{background:#fff;color:#2c3340;border-radius:16px;padding:40px;max-width:520px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-  h1{font-size:1.4rem;color:#1a4d63;margin-bottom:6px}
-  p{font-size:.9rem;color:#6b7685;margin-bottom:20px;line-height:1.6}
-  .step{display:flex;gap:12px;margin-bottom:18px;align-items:flex-start}
-  .step-num{width:28px;height:28px;background:#e8f1f5;color:#1a4d63;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:.85rem;flex-shrink:0}
-  .step-text{font-size:.88rem;line-height:1.6}
-  .step-text a{color:#2b6e8a}
-  input[type=password],input[type=text]{width:100%;padding:10px 14px;border:1px solid #e2e6eb;border-radius:8px;font-size:.9rem;font-family:inherit;margin-bottom:10px}
-  input:focus{outline:none;border-color:#4a9ab5;box-shadow:0 0 0 3px rgba(43,110,138,.15)}
-  .btn{padding:12px 24px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;font-family:inherit;width:100%;transition:all .15s}
-  .btn-primary{background:#1a4d63;color:#fff}.btn-primary:hover{background:#2b6e8a}
-  .btn-file{background:#e8f1f5;color:#1a4d63;margin-bottom:10px;border:2px dashed #4a9ab5}
-  .btn-file:hover{background:#d6eaf0}
-  .status{margin-top:16px;padding:12px;border-radius:8px;font-size:.85rem;display:none}
-  .status.ok{display:block;background:#e8f5e9;color:#2e7d32}
-  .status.err{display:block;background:#ffebee;color:#c62828}
-  .status.info{display:block;background:#e8f1f5;color:#1a4d63}
-  .file-name{font-size:.82rem;color:#6b7685;margin-bottom:10px}
-  label{display:block;font-size:.78rem;font-weight:600;color:#6b7685;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-  .section{margin-bottom:24px}
-  hr{border:none;border-top:1px solid #eee;margin:24px 0}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skodbovej 9 – Hvide Sande</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --dune: #c2a97e;
+            --dune-light: #d4c4a0;
+            --sand: #f5efe4;
+            --sand-light: #faf7f1;
+            --ocean: #2b6e8a;
+            --ocean-deep: #1a4d63;
+            --ocean-light: #4a9ab5;
+            --foam: #e8f1f5;
+            --sky: #7eb8cf;
+            --driftwood: #5c4f3d;
+            --grass: #6b8a5e;
+            --sunset: #d4885a;
+            --text: #3a3428;
+            --text-light: #6d6354;
+            --white: #ffffff;
+            --bg: #faf8f4;
+        }
+
+        html { scroll-behavior: smooth; }
+        body { font-family: 'DM Sans', -apple-system, sans-serif; color: var(--text); background: var(--bg); line-height: 1.7; }
+
+        /* ─── HEADER ─── */
+        header { background: rgba(26,77,99,0.95); backdrop-filter: blur(12px); color: white; position: fixed; width: 100%; top: 0; z-index: 1000; box-shadow: 0 1px 12px rgba(0,0,0,0.1); }
+        .header-inner { max-width: 1200px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 64px; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; font-weight: 600; }
+        .logo span { color: var(--dune-light); }
+        nav { display: flex; gap: 4px; align-items: center; }
+        nav a { color: rgba(255,255,255,0.75); text-decoration: none; font-size: 0.82rem; font-weight: 500; padding: 7px 12px; border-radius: 6px; transition: all 0.2s; }
+        nav a:hover { color: white; background: rgba(255,255,255,0.12); }
+        .hamburger { display: none; background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 8px; }
+
+        /* ─── MOBILE NAV ─── */
+        .mobile-nav { display: none; position: fixed; top: 64px; left: 0; right: 0; bottom: 0; background: var(--ocean-deep); z-index: 999; padding: 20px; overflow-y: auto; }
+        .mobile-nav.active { display: flex; flex-direction: column; gap: 2px; }
+        .mobile-nav a { color: rgba(255,255,255,0.85); text-decoration: none; padding: 14px 16px; border-radius: 8px; font-size: 1rem; transition: background 0.2s; }
+        .mobile-nav a:hover { background: rgba(255,255,255,0.08); }
+
+        /* ─── HERO ─── */
+        .hero { margin-top: 64px; position: relative; height: 85vh; min-height: 500px; max-height: 800px; overflow: hidden; }
+        .hero-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(26,77,99,0.15) 0%, rgba(26,77,99,0.1) 40%, rgba(26,52,40,0.55) 75%, rgba(20,35,30,0.8) 100%); display: flex; flex-direction: column; justify-content: flex-end; padding: 60px 40px; }
+        .hero h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; font-weight: 700; color: white; margin-bottom: 12px; text-shadow: 0 2px 20px rgba(0,0,0,0.3); }
+        .hero .subtitle { font-size: 1.1rem; color: rgba(255,255,255,0.85); max-width: 550px; font-weight: 300; margin-bottom: 24px; }
+        .hero .address-pill { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); backdrop-filter: blur(12px); padding: 10px 22px; border-radius: 30px; color: white; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); }
+
+        /* ─── WAVE ─── */
+        .wave-divider { display: block; width: 100%; height: auto; margin-top: -2px; }
+
+        /* ─── SECTIONS ─── */
+        .section { max-width: 960px; margin: 0 auto; padding: 72px 24px; }
+        .section-header { display: flex; align-items: center; gap: 16px; margin-bottom: 10px; }
+        .section-icon { width: 42px; height: 42px; background: var(--foam); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--ocean-deep); }
+        .section-divider { width: 50px; height: 3px; background: linear-gradient(90deg, var(--dune), var(--ocean-light)); border-radius: 2px; margin-bottom: 28px; }
+        .section p { margin-bottom: 16px; font-size: 1rem; }
+
+        /* ─── GALLERY ─── */
+        .gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 20px; }
+        .gallery-item { position: relative; border-radius: 12px; overflow: hidden; aspect-ratio: 4/3; cursor: pointer; }
+        .gallery-item.wide { grid-column: span 2; }
+        .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s ease; }
+        .gallery-item:hover img { transform: scale(1.05); }
+        .gallery-caption { position: absolute; bottom: 0; left: 0; right: 0; padding: 30px 16px 12px; background: linear-gradient(to top, rgba(0,0,0,0.6), transparent); color: white; font-size: 0.85rem; font-weight: 500; }
+
+        /* ─── LIGHTBOX ─── */
+        .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 2000; align-items: center; justify-content: center; cursor: pointer; }
+        .lightbox.active { display: flex; }
+        .lightbox img { max-width: 90vw; max-height: 90vh; border-radius: 8px; object-fit: contain; }
+        .lightbox-close { position: absolute; top: 20px; right: 24px; color: white; font-size: 2rem; background: none; border: none; cursor: pointer; opacity: 0.7; }
+        .lightbox-close:hover { opacity: 1; }
+
+        /* ─── CARDS ─── */
+        .card { background: white; border-radius: 14px; padding: 28px; margin-bottom: 20px; box-shadow: 0 1px 4px rgba(0,0,0,0.04), 0 6px 20px rgba(0,0,0,0.03); border: 1px solid rgba(194,169,126,0.15); }
+        .card h3 { font-size: 1.15rem; font-weight: 600; color: var(--ocean-deep); margin-bottom: 10px; }
+        .card p { color: var(--text-light); font-size: 0.95rem; line-height: 1.7; }
+        .card-with-img { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+        .card-with-img img { width: 100%; border-radius: 10px; object-fit: cover; }
+
+        /* ─── FEATURES GRID ─── */
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-top: 20px; }
+        .feature-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid rgba(194,169,126,0.12); transition: transform 0.2s, box-shadow 0.2s; }
+        .feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .feature-card-img { width: 100%; height: 160px; object-fit: cover; border-radius: 10px; margin-bottom: 16px; }
+        .feature-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--foam), #d6eaf0); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; margin-bottom: 14px; }
+        .feature-card h3 { font-size: 1rem; font-weight: 600; color: var(--ocean-deep); margin-bottom: 6px; }
+        .feature-card p { color: var(--text-light); font-size: 0.88rem; line-height: 1.6; }
+
+        /* ─── ACTIVITIES ─── */
+        .activities-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-top: 10px; }
+        .activity-card { background: white; border-radius: 14px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.04); border: 1px solid rgba(194,169,126,0.12); transition: transform 0.2s, box-shadow 0.2s; text-align: center; }
+        .activity-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+        .activity-icon { font-size: 2.2rem; margin-bottom: 10px; }
+        .activity-card h3 { font-size: 1rem; font-weight: 600; color: var(--ocean-deep); margin-bottom: 6px; }
+        .activity-card p { color: var(--text-light); font-size: 0.85rem; line-height: 1.6; margin-bottom: 12px; }
+        .activity-card .link-btn { font-size: 0.8rem; }
+
+        /* ─── STEPS ─── */
+        .step { display: flex; gap: 18px; margin-bottom: 22px; align-items: flex-start; }
+        .step-num { width: 34px; height: 34px; min-width: 34px; background: linear-gradient(135deg, var(--ocean), var(--ocean-light)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.85rem; }
+        .step-content h4 { font-weight: 600; color: var(--ocean-deep); margin-bottom: 3px; }
+        .step-content p { color: var(--text-light); font-size: 0.95rem; }
+
+        /* ─── CHECKLIST ─── */
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid rgba(194,169,126,0.15); font-size: 0.95rem; }
+        .check-circle { width: 22px; height: 22px; min-width: 22px; border: 2px solid var(--ocean-light); border-radius: 50%; }
+
+        /* ─── INFO BOX ─── */
+        .info-box { background: var(--foam); border-left: 4px solid var(--ocean-light); padding: 18px 22px; border-radius: 0 10px 10px 0; margin: 20px 0; font-size: 0.95rem; }
+        .info-box.warm { background: linear-gradient(135deg, #fdf5ec, #fceee0); border-left-color: var(--sunset); }
+        .info-box.green { background: linear-gradient(135deg, #ecf5ec, #e0f0e0); border-left-color: var(--grass); }
+        .info-box strong { display: block; margin-bottom: 4px; color: var(--ocean-deep); }
+
+        /* ─── BUTTONS ─── */
+        .link-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--ocean); color: white; text-decoration: none; padding: 9px 18px; border-radius: 8px; font-size: 0.85rem; font-weight: 500; transition: all 0.2s; margin-top: 12px; }
+        .link-btn:hover { background: var(--ocean-deep); transform: translateY(-1px); }
+        .play-icon { display: inline-block; width: 14px; height: 14px; }
+
+        /* ─── MISC ─── */
+        .section-separator { max-width: 960px; margin: 0 auto; border: none; border-top: 1px solid rgba(194,169,126,0.2); }
+        .floor-plan-img { width: 100%; max-width: 700px; border-radius: 12px; margin-top: 20px; box-shadow: 0 4px 16px rgba(0,0,0,0.06); border: 1px solid rgba(194,169,126,0.15); }
+        .room-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+        .room-tag { background: var(--foam); color: var(--ocean-deep); padding: 7px 14px; border-radius: 20px; font-size: 0.82rem; font-weight: 500; border: 1px solid rgba(43,110,138,0.1); }
+        .emergency-card { background: white; border-radius: 14px; padding: 24px; margin-bottom: 16px; border: 1px solid rgba(194,169,126,0.12); box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+        .emergency-card h3 { color: #b8553a; font-size: 1.1rem; margin-bottom: 8px; }
+        .emergency-card p { color: var(--text-light); font-size: 0.95rem; }
+        .emergency-img { width: 100%; border-radius: 10px; margin-top: 14px; max-height: 250px; object-fit: cover; }
+        .coastal-band { background: linear-gradient(135deg, var(--ocean-deep), var(--ocean), var(--sky)); padding: 48px 24px; text-align: center; color: white; }
+        .coastal-band h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 8px; }
+        .coastal-band p { opacity: 0.8; font-size: 0.95rem; }
+        .view-banner { width: 100%; max-height: 400px; object-fit: cover; display: block; }
+
+        /* ─── FOOTER ─── */
+        footer { background: var(--ocean-deep); color: rgba(255,255,255,0.7); text-align: center; padding: 48px 24px 36px; }
+        footer .footer-title { font-family: 'Playfair Display', serif; color: white; font-size: 1.4rem; margin-bottom: 6px; }
+        footer .footer-sub { font-size: 0.9rem; opacity: 0.7; margin-bottom: 20px; }
+        .footer-wave { display: flex; justify-content: center; gap: 4px; margin-bottom: 16px; }
+        .footer-wave span { display: block; width: 30px; height: 3px; background: var(--dune-light); border-radius: 2px; opacity: 0.4; }
+
+        /* ─── PRINT CENTER ─── */
+        .print-center { max-width: 960px; margin: 0 auto; padding: 72px 24px; }
+        .print-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 24px; }
+        .print-card { background: white; border: 1px solid rgba(194,169,126,0.2); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; transition: all 0.2s; }
+        .print-card:hover { border-color: var(--ocean); box-shadow: 0 4px 16px rgba(43,110,138,0.12); transform: translateY(-2px); }
+        .print-card .print-icon { font-size: 1.6rem; margin-bottom: 10px; }
+        .print-card h4 { font-size: 0.9rem; color: var(--ocean-deep); margin-bottom: 4px; }
+        .print-card p { font-size: 0.78rem; color: var(--text-light); }
+        .print-all-btn { display: inline-flex; align-items: center; gap: 8px; background: var(--ocean-deep); color: white; border: none; padding: 12px 28px; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.2s; margin-top: 20px; font-family: inherit; }
+        .print-all-btn:hover { background: var(--ocean); transform: translateY(-1px); }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 768px) {
+            nav { display: none; }
+            .hamburger { display: block; }
+            .hero h1 { font-size: 2.4rem; }
+            .hero-overlay { padding: 40px 24px; }
+            .hero { height: 70vh; min-height: 400px; }
+            .section, .print-center { padding: 48px 20px; }
+            .features-grid { grid-template-columns: 1fr; }
+            .activities-grid { grid-template-columns: 1fr 1fr; }
+            .gallery { grid-template-columns: 1fr 1fr; }
+            .gallery-item.wide { grid-column: span 1; }
+            .card { padding: 22px; }
+            .card-with-img { grid-template-columns: 1fr; }
+            .print-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        @media (max-width: 480px) {
+            .gallery { grid-template-columns: 1fr; }
+            .print-grid { grid-template-columns: 1fr; }
+        }
+
+        /* ═══════════════════════════════════════
+           PRINT STYLES – A4 FORMATTED PAGES
+           ═══════════════════════════════════════ */
+        @media print {
+            /* Hide website UI */
+            header, .mobile-nav, .hero, .wave-divider, .view-banner,
+            .coastal-band, footer, .lightbox, .print-center,
+            .section, .section-separator, #mainContent { display: none !important; }
+
+            /* Show print content */
+            #printContent { display: block !important; }
+
+            body { background: white; color: #222; font-size: 11pt; line-height: 1.5; margin: 0; padding: 0; font-family: 'DM Sans', Arial, sans-serif; }
+
+            .print-page {
+                page-break-after: always;
+                padding: 15mm 18mm;
+                max-width: 210mm;
+                min-height: 277mm;
+                position: relative;
+            }
+            .print-page:last-child { page-break-after: avoid; }
+
+            .print-page-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 2px solid #2b6e8a;
+                padding-bottom: 8px;
+                margin-bottom: 20px;
+            }
+            .print-page-header h1 {
+                font-family: 'Playfair Display', Georgia, serif;
+                font-size: 18pt;
+                color: #1a4d63;
+                margin: 0;
+            }
+            .print-page-header .print-addr {
+                font-size: 9pt;
+                color: #6d6354;
+            }
+
+            .print-page h2 {
+                font-family: 'Playfair Display', Georgia, serif;
+                font-size: 15pt;
+                color: #1a4d63;
+                margin: 18px 0 8px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 4px;
+            }
+
+            .print-page h3 { font-size: 11pt; color: #2b6e8a; margin: 12px 0 4px; }
+            .print-page p { margin: 4px 0 10px; font-size: 10pt; color: #333; }
+
+            .print-page img {
+                max-width: 100%;
+                max-height: 200px;
+                border-radius: 6px;
+                object-fit: cover;
+                margin: 8px 0;
+            }
+            .print-page img.print-floor-plan { max-height: 340px; }
+
+            .print-img-row {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                margin: 8px 0;
+            }
+            .print-img-row img { max-width: 48%; max-height: 150px; }
+
+            .print-step { display: flex; gap: 10px; margin: 6px 0; align-items: flex-start; }
+            .print-step-num { width: 22px; height: 22px; min-width: 22px; background: #2b6e8a; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 9pt; }
+            .print-step-text { font-size: 10pt; }
+            .print-step-text strong { color: #1a4d63; }
+
+            .print-checklist { list-style: none; padding: 0; margin: 10px 0; }
+            .print-checklist li { display: flex; align-items: center; gap: 10px; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 10pt; }
+            .print-check-box { width: 16px; height: 16px; min-width: 16px; border: 1.5px solid #2b6e8a; border-radius: 3px; }
+
+            .print-info { background: #f0f6f8; border-left: 3px solid #4a9ab5; padding: 8px 12px; margin: 10px 0; border-radius: 0 6px 6px 0; font-size: 9.5pt; }
+            .print-info strong { color: #1a4d63; display: block; margin-bottom: 2px; }
+
+            .print-warning { background: #fef5ec; border-left: 3px solid #d4885a; padding: 8px 12px; margin: 10px 0; border-radius: 0 6px 6px 0; font-size: 9.5pt; }
+            .print-warning strong { color: #b8553a; display: block; margin-bottom: 2px; }
+
+            .print-footer {
+                position: absolute;
+                bottom: 12mm;
+                left: 18mm;
+                right: 18mm;
+                border-top: 1px solid #ddd;
+                padding-top: 6px;
+                font-size: 8pt;
+                color: #999;
+                display: flex;
+                justify-content: space-between;
+            }
+
+            .print-link { color: #2b6e8a; font-size: 9pt; }
+
+            @page { size: A4; margin: 0; }
+        }
+    </style>
 </head>
 <body>
-<div class="card">
-  <h1>Deploy to GitHub Pages</h1>
-  <p>Push your index.html to <strong>Imunch/skodbovej9</strong> with one click.</p>
 
-  <div class="section">
-    <div class="step"><div class="step-num">1</div><div class="step-text">Create a Personal Access Token at <a href="https://github.com/settings/tokens/new?description=skodbovej9-deploy&scopes=repo" target="_blank">github.com/settings/tokens</a> — check the <strong>"repo"</strong> scope, then click "Generate token".</div></div>
-    <label>GitHub Token</label>
-    <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxx">
-  </div>
+<!-- ════════════════════════════════════════════
+     MAIN WEBSITE CONTENT (hidden when printing)
+     ════════════════════════════════════════════ -->
+<div id="mainContent">
 
-  <div class="section">
-    <div class="step"><div class="step-num">2</div><div class="step-text">Select your <strong>index.html</strong> file from the Sommerhus folder.</div></div>
-    <input type="file" id="filePick" accept=".html" style="display:none">
-    <button class="btn btn-file" onclick="document.getElementById('filePick').click()">Choose index.html</button>
-    <div class="file-name" id="fileName">No file selected</div>
-  </div>
+<header>
+    <div class="header-inner">
+        <div class="logo">Skodbovej <span>9</span></div>
+        <nav>
+            <a href="#gallery">The House</a>
+            <a href="#layout">Layout</a>
+            <a href="#access">Access</a>
+            <a href="#tv">TV</a>
+            <a href="#heating">Heating</a>
+            <a href="#kitchen">Kitchen</a>
+            <a href="#emergency">Emergency</a>
+            <a href="#activities">Activities</a>
+            <a href="#print-section">Print</a>
+        </nav>
+        <button class="hamburger" onclick="toggleMenu()" aria-label="Menu">&#9776;</button>
+    </div>
+</header>
 
-  <hr>
-  <button class="btn btn-primary" onclick="deploy()">Deploy to GitHub Pages</button>
-  <div class="status" id="status"></div>
+<div class="mobile-nav" id="mobileNav">
+    <a href="#gallery" onclick="closeMenu()">The House</a>
+    <a href="#layout" onclick="closeMenu()">Layout</a>
+    <a href="#access" onclick="closeMenu()">Access</a>
+    <a href="#wifi" onclick="closeMenu()">WiFi</a>
+    <a href="#tv" onclick="closeMenu()">TV & Radio</a>
+    <a href="#heating" onclick="closeMenu()">Heating</a>
+    <a href="#kitchen" onclick="closeMenu()">Kitchen</a>
+    <a href="#emergency" onclick="closeMenu()">Emergency</a>
+    <a href="#activities" onclick="closeMenu()">Activities</a>
+    <a href="#checklist" onclick="closeMenu()">Checklist</a>
+    <a href="#print-section" onclick="closeMenu()">Print Pages</a>
+</div>
+
+<!-- content will be injected by JS into here -->
+<div id="dynamicContent"></div>
+
+</div>
+
+<!-- ════════════════════════════════════════════
+     PRINT CONTENT (hidden on screen, shown when printing)
+     ════════════════════════════════════════════ -->
+<div id="printContent" style="display:none;"></div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <button class="lightbox-close">&times;</button>
+    <img id="lightboxImg" src="" alt="">
 </div>
 
 <script>
-let fileContent = null;
-document.getElementById('filePick').addEventListener('change', function(e) {
-  const f = e.target.files[0];
-  if (!f) return;
-  document.getElementById('fileName').textContent = f.name + ' (' + (f.size/1024).toFixed(1) + ' KB)';
-  const reader = new FileReader();
-  reader.onload = function(ev) { fileContent = ev.target.result; };
-  reader.readAsText(f);
+/* ─── MENU ─── */
+function toggleMenu() { document.getElementById('mobileNav').classList.toggle('active'); }
+function closeMenu() { document.getElementById('mobileNav').classList.remove('active'); }
+
+/* ─── LIGHTBOX ─── */
+function openLightbox(el) {
+    const img = el.querySelector('img');
+    document.getElementById('lightboxImg').src = img.src;
+    document.getElementById('lightbox').classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+    document.getElementById('lightbox').classList.remove('active');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+/* ─── SMOOTH SCROLL ─── */
+document.addEventListener('click', e => {
+    const a = e.target.closest('a[href^="#"]');
+    if (!a) return;
+    e.preventDefault();
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+        window.scrollTo({ top: target.getBoundingClientRect().top + window.pageYOffset - 74, behavior: 'smooth' });
+    }
+    closeMenu();
 });
 
-async function deploy() {
-  const token = document.getElementById('token').value.trim();
-  const status = document.getElementById('status');
+/* ─── PRINT SPECIFIC SECTION ─── */
+function printSection(sectionId) {
+    const pc = document.getElementById('printContent');
+    // Build only the requested page(s)
+    buildPrintContent(sectionId);
+    window.print();
+}
 
-  if (!token) { status.className='status err'; status.textContent='Please enter your GitHub token.'; return; }
-  if (!fileContent) { status.className='status err'; status.textContent='Please select index.html first.'; return; }
+function printAll() {
+    buildPrintContent('all');
+    window.print();
+}
 
-  status.className='status info'; status.textContent='Deploying...';
+/* ═══════════════════════════════════════
+   SITE DATA
+   Edit this object to update the website content.
+   You can also keep a separate data.json — if served
+   via a web server, the page will load it instead.
+   ═══════════════════════════════════════ */
+const SITE_DATA = {
+  "site": {
+    "title": "Skodbovej 9",
+    "subtitle": "Your home by the North Sea in Hvide Sande. Everything you need to know about the house is right here.",
+    "address": "Skodbovej 9, 6960 Hvide Sande",
+    "footerTagline": "We hope you enjoyed your stay by the sea",
+    "heroImage": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/PnqMzn7OzgsmvKKcE1K5.jpeg"
+  },
+  "gallery": [
+    { "src": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/vndsab9qQOMqnCVohqc5.jpeg", "caption": "Dining Area & Alcove", "wide": true },
+    { "src": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/DRIuiS8nZADll0yqTx2z.jpeg", "caption": "Living / TV Area" },
+    { "src": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/CA59dPRUHJUr0cWWNaYo.jpeg", "caption": "Kitchen" },
+    { "src": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/x2Zb3Fx2wz4gJjXyd8oH.jpeg", "caption": "Bathroom" },
+    { "src": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/ZQJ3jwaeYWfpTG8SvvXb.jpeg", "caption": "Large Bedroom" },
+    { "src": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/q3Z7KgwzlOL20KZYgvZl.jpeg", "caption": "Small Room (right)" },
+    { "src": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/SxyGSb4MMdvFGN2mjgZu.jpeg", "caption": "Small Room (left)" }
+  ],
+  "layout": {
+    "description": "The house has 3 bedrooms, 1 alcove (120 x 200 cm), 1 bathroom, and 1 main living room with kitchen area.",
+    "floorPlanImage": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/kOjxCfDqUBjYnLflybdO.png",
+    "rooms": ["Living Room", "Kitchen", "Large Bedroom", "Small Bedroom (right)", "Small Bedroom (left)", "Alcove 120x200", "Bathroom", "Shed / Depot"]
+  },
+  "access": [
+    { "title": "Main Entrance", "text": "Access to the house is from the port entrance at the opposite side of the driveway. Look for the marked entry door.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/LbmJhU1QbJS0CkEITCBp.png" },
+    { "title": "Shed / Depot", "text": "Access to the depot is also from the port side of the house. Use the same key as for the front door.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/pDTJJEikGMDCI8igAweZ.png" }
+  ],
+  "wifi": {
+    "description": "The WiFi name and password can be found on the WiFi box in the room on the right at the end of the hall.",
+    "details": "The WiFi name is shown where it says <strong>\"SSID\"</strong> and the password is where it says <strong>\"WPA2 Key\"</strong>.",
+    "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/4j97JrttnEElDpV2myIm.JPG",
+    "troubleshootText": "Check that the WiFi is turned on. Sometimes the power can have been switched off by accident. Verify if the switch in the middle of the room is turned on.",
+    "troubleshootImage": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/Xby4aCsVEz2fupbjpRG1.png"
+  },
+  "tv": {
+    "steps": [
+      { "title": "Turn on the TV", "text": "Use the white remote and set the source to HDMI 1." },
+      { "title": "Open Apple TV", "text": "Using the Apple TV remote, navigate to \"Stofa Web TV\" or \"Norlys Play\"." },
+      { "title": "Find Live TV", "text": "Navigate to \"Live TV\" or \"TV overview\"." },
+      { "title": "Choose a Channel", "text": "Select your desired TV channel from the list." }
+    ],
+    "troubleshoot": "1) Check if the internet is on. 2) Make sure the WiFi range extender (Nokia) on top of the cupboard is turned on.",
+    "radio": { "text": "Turn on the TV and using the Apple TV remote, navigate to the app called \"Radio.net\".", "videoUrl": "https://youtu.be/pHQqoUsnc2M", "videoLabel": "Watch Radio Guide" }
+  },
+  "viewBanner": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/HccciBXJRlYoJk0gA799.jpeg",
+  "heating": [
+    { "title": "Aircon / Central Heating", "text": "Located in the living room, just below the TV. Stand directly in front of the unit when using the remote for best signal.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/7QMWft6FEJcVsNhrEtRo.png", "link": "https://www.pdfmanualer.dk/panasonic/cs-hz25uke-5/manual?p=18", "linkLabel": "View Manual" },
+    { "title": "Wood Stove", "text": "Feel free to use the wood in the shed (free of charge). Please empty the stove when leaving — an ash bucket is in the shed.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/iTkcxURVBBGKwDnz2HtX.png", "link": "https://www.youtube.com/watch?v=JgTSn8yzdzg", "linkLabel": "How to Start Fire", "isVideo": true },
+    { "title": "Bathroom Floor Heating", "text": "Controls are on the left side of the toilet. Move the dial clockwise to desired heat (a red light signals it's on).", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/TqaaEICiCkTS8Vl0iqJC.png" },
+    { "title": "Radiators", "text": "With central heating on, radiators shouldn't be necessary. Switch on the back, then use + and - buttons to adjust temperature.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/smroBnvLPIoThZTHraQP.png" }
+  ],
+  "waterHeater": {
+    "steps": [
+      { "title": "Locate the Water Heater", "text": "Go to the room at the end of the hall on the left. The water heater is above the door." },
+      { "title": "Turn the Dial", "text": "Turn the dial clockwise until desired heat is reached. An orange light should appear. Usually turned 3/4 up." }
+    ],
+    "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/vE60wbJ0TzZGUilIe17W.png",
+    "note": "When all hot water has been used, the tank may drip briefly — this is normal and stops within 15 minutes. For prolonged use, turn the dial to max, but don't keep this setting for extended periods."
+  },
+  "kitchen": [
+    { "title": "Refrigerator & Freezer", "text": "Both are turned on via the dial inside the refrigerator. Turn to desired cooling level and shut both doors.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/317OBdXhJpsOdBHww1ex.png" },
+    { "title": "Microwave Oven", "text": "Located inside the first kitchen cabinet on the right.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/wiuiS8Ivtm5GQQffJoB6.png" },
+    { "title": "Cooker Hood", "text": "Operating it can be tricky — see the video guide.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/dBBBhubngWAy2Y1cA4f7.jpeg", "link": "https://youtube.com/shorts/smfLnZDaZnY", "linkLabel": "How-to Video", "isVideo": true },
+    { "title": "Dishwasher", "text": "A small 2-person dishwasher below the sink. Use only 1/2 of a tablet. You may need to plug in the power cord on the right.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/AyfDq1zgt0czmXVIdPX7.jpeg", "link": "https://www.manualslib.com/manual/2079509/Daan-Tech-Bob-2020.html?page=45#manual", "linkLabel": "View Manual" }
+  ],
+  "dishwasherSteps": [
+    "Position dishes correctly in the basket.",
+    "Close the door properly (the cycle cannot start if the door is open).",
+    "The middle button is the start key. Choose the most appropriate program, then press start."
+  ],
+  "emergency": [
+    { "title": "Power Outage", "icon": "⚡", "text": "If the power disappears, go to the shed/depot outside and check the HPFI relays. The power relay is on the right side inside the shed.", "image": "https://storage.googleapis.com/glide-prod.appspot.com/uploads-v2/naQlI6dXXbkkjgXJJjIx/pub/i9GvSkdxau7LCjOXSJvg.png", "link": "https://www.youtube.com/watch?v=PmEKs_QJSc8", "linkLabel": "How-to Video Guide", "isVideo": true },
+    { "title": "Water Shut-Off", "icon": "💧", "text": "The main valve for specific areas is inside the house. To turn off water for the entire house, the main valve is located at the edge of the garden." }
+  ],
+  "activities": [
+    {
+      "title": "Hvide Sande Strand",
+      "text": "The beautiful North Sea beach is just a short drive away. Wide sandy stretches perfect for walks, swimming (when conditions allow), and watching the sunset.",
+      "icon": "🏖️",
+      "link": "https://maps.google.com/?q=Hvide+Sande+Strand",
+      "linkLabel": "See on Map"
+    },
+    {
+      "title": "Hvide Sande Slusen",
+      "text": "The famous lock between the North Sea and Ringkøbing Fjord. Watch the boats pass through and enjoy fresh fish from the harbour stalls.",
+      "icon": "⚓",
+      "link": "https://maps.google.com/?q=Hvide+Sande+Sluse",
+      "linkLabel": "See on Map"
+    },
+    {
+      "title": "Fiskeri & Lystfiskeri",
+      "text": "Hvide Sande is one of Denmark’s best fishing spots. Try your luck from the mole, the fjord, or book a fishing trip from the harbour.",
+      "icon": "🎣",
+      "link": "https://www.telesp.dk",
+      "linkLabel": "Fishing Permits"
+    },
+    {
+      "title": "Ringkøbing Town",
+      "text": "A charming old market town ~20 min drive. Lovely cobblestone streets, cafes, shops, and the Ringkøbing Museum.",
+      "icon": "🏠",
+      "link": "https://maps.google.com/?q=Ringk%C3%B8bing+centrum",
+      "linkLabel": "See on Map"
+    },
+    {
+      "title": "Surfing & Windsport",
+      "text": "Hvide Sande and Ringkøbing Fjord are world-class spots for windsurfing, kitesurfing, and SUP. Several rental shops in town.",
+      "icon": "🏄",
+      "link": "https://www.westwind.dk",
+      "linkLabel": "WestWind Surf"
+    },
+    {
+      "title": "Stauning Whisky",
+      "text": "Denmark’s most famous whisky distillery, only 30 min away. Tours and tastings available — book in advance.",
+      "icon": "🥃",
+      "link": "https://www.stauningwhisky.com",
+      "linkLabel": "Book a Tour"
+    },
+    {
+      "title": "Cykelture (Biking)",
+      "text": "Beautiful bike routes along the coast and fjord. The Vestkyststien runs right through the area. Bike rental available in Hvide Sande.",
+      "icon": "🚴",
+      "link": "https://www.visitvesterhavet.dk/hvide-sande/oplevelser/cykelture",
+      "linkLabel": "Bike Routes"
+    },
+    {
+      "title": "Søndervig & Bork Havn",
+      "text": "Two nearby coastal towns worth visiting. Søndervig has a great beach and shops, Bork Havn has the Viking Harbour experience.",
+      "icon": "⛵",
+      "link": "https://maps.google.com/?q=S%C3%B8ndervig",
+      "linkLabel": "See on Map"
+    }
+  ],
+  "checklist": [
+    "Turn off the water heater",
+    "Turn off the floor heating in the bathroom",
+    "Set the Aircon / Central Heater to +8–15 °C (Heat mode)",
+    "In the 2 back rooms, set the radiator to 5",
+    "Shut off the refrigerator and leave the door open",
+    "Take out the trash",
+    "Make sure the depot door is locked",
+    "Clean and empty the dishwasher"
+  ]
+};
 
-  try {
-    // Check if file already exists (to get its SHA for updating)
-    let sha = null;
-    const check = await fetch('https://api.github.com/repos/Imunch/skodbovej9/contents/index.html', {
-      headers: { 'Authorization': 'token ' + token }
+/* ═══════════════════════════════════════
+   LOAD DATA & BUILD PAGE
+   ═══════════════════════════════════════ */
+// Use embedded data directly — works even when opened as a local file
+const D = SITE_DATA;
+window._DATA = D;
+buildWebsite(D);
+
+function buildWebsite(D) {
+    const playIcon = '<svg class="play-icon" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>';
+    const pinIcon = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 1118 0z"/><circle cx="12" cy="10" r="3"/></svg>';
+
+    let html = '';
+
+    /* ── HERO ── */
+    html += `
+    <section class="hero">
+        <img class="hero-img" src="${D.site.heroImage}" alt="Sommerhus">
+        <div class="hero-overlay">
+            <h1>Welcome to the<br>West Coast</h1>
+            <p class="subtitle">${D.site.subtitle}</p>
+            <div class="address-pill">${pinIcon} ${D.site.address}</div>
+        </div>
+    </section>
+    <svg class="wave-divider" viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <path d="M0 30C240 5 480 50 720 30C960 10 1200 45 1440 25V60H0V30Z" fill="#faf8f4"/>
+    </svg>`;
+
+    /* ── GALLERY ── */
+    html += `<section class="section" id="gallery">
+        <div class="section-header"><div class="section-icon">&#127968;</div><h2 class="section-title">The House</h2></div>
+        <div class="section-divider"></div>
+        <div class="gallery">`;
+    D.gallery.forEach(img => {
+        html += `<div class="gallery-item${img.wide ? ' wide' : ''}" onclick="openLightbox(this)">
+            <img src="${img.src}" alt="${img.caption}" loading="lazy">
+            <div class="gallery-caption">${img.caption}</div>
+        </div>`;
     });
-    if (check.ok) {
-      const data = await check.json();
-      sha = data.sha;
+    html += `</div></section><hr class="section-separator">`;
+
+    /* ── LAYOUT ── */
+    html += `<section class="section" id="layout">
+        <div class="section-header"><div class="section-icon">&#128209;</div><h2 class="section-title">The Layout</h2></div>
+        <div class="section-divider"></div>
+        <p>${D.layout.description}</p>
+        <img class="floor-plan-img" src="${D.layout.floorPlanImage}" alt="Floor plan">
+        <div class="room-tags">${D.layout.rooms.map(r => `<span class="room-tag">${r}</span>`).join('')}</div>
+    </section><hr class="section-separator">`;
+
+    /* ── ACCESS ── */
+    html += `<section class="section" id="access">
+        <div class="section-header"><div class="section-icon">&#128273;</div><h2 class="section-title">Access to the House</h2></div>
+        <div class="section-divider"></div>`;
+    D.access.forEach(a => {
+        html += `<div class="card"><div class="card-with-img"><div><h3>${a.title}</h3><p>${a.text}</p></div>
+        <img src="${a.image}" alt="${a.title}" loading="lazy"></div></div>`;
+    });
+    html += `</section><hr class="section-separator">`;
+
+    /* ── WIFI ── */
+    html += `<section class="section" id="wifi">
+        <div class="section-header"><div class="section-icon">&#128246;</div><h2 class="section-title">WiFi &amp; Internet</h2></div>
+        <div class="section-divider"></div>
+        <div class="card"><div class="card-with-img"><div><h3>Connecting to WiFi</h3><p>${D.wifi.description}</p><p>${D.wifi.details}</p></div>
+        <img src="${D.wifi.image}" alt="WiFi box" loading="lazy"></div></div>
+        <div class="info-box green"><strong>Trouble with the Internet?</strong>${D.wifi.troubleshootText}</div>
+        <img src="${D.wifi.troubleshootImage}" alt="WiFi switch" loading="lazy" style="width:100%;max-width:500px;border-radius:10px;margin-top:12px;">
+    </section><hr class="section-separator">`;
+
+    /* ── TV ── */
+    html += `<section class="section" id="tv">
+        <div class="section-header"><div class="section-icon">&#128250;</div><h2 class="section-title">TV &amp; Radio</h2></div>
+        <div class="section-divider"></div>
+        <div class="card"><h3>Watching TV Channels</h3>`;
+    D.tv.steps.forEach((s, i) => {
+        html += `<div class="step"><div class="step-num">${i+1}</div><div class="step-content"><h4>${s.title}</h4><p>${s.text}</p></div></div>`;
+    });
+    html += `</div>
+        <div class="info-box warm"><strong>TV Troubleshooting</strong>${D.tv.troubleshoot}</div>
+        <div class="card" style="margin-top:20px"><h3>Radio</h3><p>${D.tv.radio.text}</p>
+        <a href="${D.tv.radio.videoUrl}" target="_blank" class="link-btn">${playIcon} ${D.tv.radio.videoLabel}</a></div>
+    </section>`;
+
+    /* ── VIEW BANNER ── */
+    html += `<img class="view-banner" src="${D.viewBanner}" alt="View from the house" loading="lazy">`;
+
+    /* ── HEATING ── */
+    html += `<section class="section" id="heating">
+        <div class="section-header"><div class="section-icon">&#127777;</div><h2 class="section-title">Heating &amp; Climate</h2></div>
+        <div class="section-divider"></div>
+        <div class="features-grid">`;
+    D.heating.forEach(h => {
+        html += `<div class="feature-card">
+            <img class="feature-card-img" src="${h.image}" alt="${h.title}" loading="lazy">
+            <h3>${h.title}</h3><p>${h.text}</p>`;
+        if (h.link) html += `<a href="${h.link}" target="_blank" class="link-btn">${h.isVideo ? playIcon : ''} ${h.linkLabel}</a>`;
+        html += `</div>`;
+    });
+    html += `</div></section><hr class="section-separator">`;
+
+    /* ── WATER HEATER ── */
+    html += `<section class="section" id="water">
+        <div class="section-header"><div class="section-icon">&#128167;</div><h2 class="section-title">Water Heater</h2></div>
+        <div class="section-divider"></div>
+        <div class="card"><div class="card-with-img"><div>`;
+    D.waterHeater.steps.forEach((s, i) => {
+        html += `<div class="step"><div class="step-num">${i+1}</div><div class="step-content"><h4>${s.title}</h4><p>${s.text}</p></div></div>`;
+    });
+    html += `</div><img src="${D.waterHeater.image}" alt="Water heater" loading="lazy"></div></div>
+        <div class="info-box warm"><strong>Good to know</strong>${D.waterHeater.note}</div>
+    </section><hr class="section-separator">`;
+
+    /* ── KITCHEN ── */
+    html += `<section class="section" id="kitchen">
+        <div class="section-header"><div class="section-icon">&#127860;</div><h2 class="section-title">Kitchen</h2></div>
+        <div class="section-divider"></div>
+        <div class="features-grid">`;
+    D.kitchen.forEach(k => {
+        html += `<div class="feature-card">
+            <img class="feature-card-img" src="${k.image}" alt="${k.title}" loading="lazy">
+            <h3>${k.title}</h3><p>${k.text}</p>`;
+        if (k.link) html += `<a href="${k.link}" target="_blank" class="link-btn">${k.isVideo ? playIcon : ''} ${k.linkLabel}</a>`;
+        html += `</div>`;
+    });
+    html += `</div><div class="card" style="margin-top:20px"><h3>Using the Dishwasher</h3>`;
+    D.dishwasherSteps.forEach((s, i) => {
+        html += `<div class="step"><div class="step-num">${i+1}</div><div class="step-content"><p>${s}</p></div></div>`;
+    });
+    html += `</div></section><hr class="section-separator">`;
+
+    /* ── EMERGENCY ── */
+    html += `<section class="section" id="emergency">
+        <div class="section-header"><div class="section-icon">&#9888;&#65039;</div><h2 class="section-title">In Case of Emergency</h2></div>
+        <div class="section-divider"></div>`;
+    D.emergency.forEach(e => {
+        html += `<div class="emergency-card"><h3>${e.icon} ${e.title}</h3><p>${e.text}</p>`;
+        if (e.image) html += `<img class="emergency-img" src="${e.image}" alt="${e.title}" loading="lazy">`;
+        if (e.link) html += `<a href="${e.link}" target="_blank" class="link-btn" style="margin-top:14px">${e.isVideo ? playIcon : ''} ${e.linkLabel}</a>`;
+        html += `</div>`;
+    });
+    html += `</section><hr class="section-separator">`;
+
+    /* ── ACTIVITIES / THINGS TO DO ── */
+    if (D.activities && D.activities.length) {
+        html += `<section class="section" id="activities">
+            <div class="section-header"><div class="section-icon">&#127965;</div><h2 class="section-title">Things to Do in the Area</h2></div>
+            <div class="section-divider"></div>
+            <p style="margin-bottom:20px;">Hvide Sande and the surrounding West Coast offer plenty to explore — from beaches and fishing to charming towns and outdoor adventures.</p>
+            <div class="activities-grid">`;
+        D.activities.forEach(a => {
+            html += `<div class="activity-card">
+                <div class="activity-icon">${a.icon || ''}</div>
+                <h3>${a.title}</h3>
+                <p>${a.text}</p>`;
+            if (a.link) html += `<a href="${a.link}" target="_blank" class="link-btn">${a.linkLabel || 'More Info'}</a>`;
+            html += `</div>`;
+        });
+        html += `</div></section><hr class="section-separator">`;
     }
 
-    // Create or update the file
-    const body = {
-      message: 'Deploy website update',
-      content: btoa(unescape(encodeURIComponent(fileContent)))
-    };
-    if (sha) body.sha = sha;
+    /* ── CHECKLIST ── */
+    html += `<div class="coastal-band"><h2>Before You Leave</h2><p>Please complete the checklist below</p></div>
+    <section class="section" id="checklist"><div class="card"><ul class="checklist">`;
+    D.checklist.forEach(c => { html += `<li><span class="check-circle"></span>${c}</li>`; });
+    html += `</ul></div></section>`;
 
-    const resp = await fetch('https://api.github.com/repos/Imunch/skodbovej9/contents/index.html', {
-      method: 'PUT',
-      headers: {
-        'Authorization': 'token ' + token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
+    /* ── PRINT CENTER ── */
+    html += `
+    <hr class="section-separator">
+    <div class="print-center" id="print-section">
+        <div class="section-header"><div class="section-icon">&#128424;</div><h2 class="section-title">Print Pages (A4)</h2></div>
+        <div class="section-divider"></div>
+        <p>Print individual sections as clean A4 pages — perfect to leave on the table for your guests.</p>
+        <div class="print-grid">
+            <div class="print-card" onclick="printSection('welcome')"><div class="print-icon">&#127968;</div><h4>Welcome & Layout</h4><p>Floor plan & rooms</p></div>
+            <div class="print-card" onclick="printSection('access')"><div class="print-icon">&#128273;</div><h4>Access</h4><p>Entrance & depot</p></div>
+            <div class="print-card" onclick="printSection('wifi')"><div class="print-icon">&#128246;</div><h4>WiFi</h4><p>Connection guide</p></div>
+            <div class="print-card" onclick="printSection('tv')"><div class="print-icon">&#128250;</div><h4>TV & Radio</h4><p>Step-by-step</p></div>
+            <div class="print-card" onclick="printSection('heating')"><div class="print-icon">&#127777;</div><h4>Heating</h4><p>All heating options</p></div>
+            <div class="print-card" onclick="printSection('water')"><div class="print-icon">&#128167;</div><h4>Water Heater</h4><p>How to use</p></div>
+            <div class="print-card" onclick="printSection('kitchen')"><div class="print-icon">&#127860;</div><h4>Kitchen</h4><p>Appliances guide</p></div>
+            <div class="print-card" onclick="printSection('emergency')"><div class="print-icon">&#9888;&#65039;</div><h4>Emergency</h4><p>Power & water</p></div>
+            <div class="print-card" onclick="printSection('activities')"><div class="print-icon">&#127965;</div><h4>Activities</h4><p>Things to do nearby</p></div>
+            <div class="print-card" onclick="printSection('checklist')"><div class="print-icon">&#9745;</div><h4>Checklist</h4><p>Leaving the house</p></div>
+        </div>
+        <button class="print-all-btn" onclick="printAll()">
+            <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+            Print All Pages
+        </button>
+    </div>`;
 
-    if (resp.ok) {
-      status.className='status ok';
-      status.innerHTML='Deployed! Your site will be live at <a href="https://imunch.github.io/skodbovej9/" target="_blank">https://imunch.github.io/skodbovej9/</a> within a minute.';
-    } else {
-      const err = await resp.json();
-      status.className='status err';
-      status.textContent='Error: ' + (err.message || resp.statusText);
+    /* ── FOOTER ── */
+    html += `<footer>
+        <div class="footer-wave"><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="footer-title">${D.site.title}</div>
+        <p class="footer-sub">Hvide Sande &middot; The Danish West Coast</p>
+        <p style="font-size:0.8rem;opacity:0.4;">${D.site.footerTagline}</p>
+    </footer>`;
+
+    document.getElementById('dynamicContent').innerHTML = html;
+}
+
+/* ═══════════════════════════════════════
+   BUILD PRINT CONTENT
+   ═══════════════════════════════════════ */
+function buildPrintContent(which) {
+    const D = window._DATA;
+    if (!D) return;
+    let pages = '';
+
+    const hdr = `<div class="print-page-header"><h1>Skodbovej 9</h1><span class="print-addr">${D.site.address}</span></div>`;
+    const ftr = (label) => `<div class="print-footer"><span>${label}</span><span>skodbovej9.glide.page</span></div>`;
+
+    /* ── Welcome & Layout ── */
+    if (which === 'all' || which === 'welcome') {
+        pages += `<div class="print-page">${hdr}
+            <h2>Welcome & Layout</h2>
+            <p>${D.layout.description}</p>
+            <img class="print-floor-plan" src="${D.layout.floorPlanImage}" alt="Floor plan">
+            <p style="margin-top:10px"><strong>Rooms:</strong> ${D.layout.rooms.join(' &middot; ')}</p>
+            ${ftr('Welcome & Layout')}
+        </div>`;
     }
-  } catch(e) {
-    status.className='status err';
-    status.textContent='Error: ' + e.message;
-  }
+
+    /* ── Access ── */
+    if (which === 'all' || which === 'access') {
+        pages += `<div class="print-page">${hdr}<h2>Access to the House</h2>`;
+        D.access.forEach(a => {
+            pages += `<h3>${a.title}</h3><p>${a.text}</p><img src="${a.image}" alt="${a.title}">`;
+        });
+        pages += `${ftr('Access')}</div>`;
+    }
+
+    /* ── WiFi ── */
+    if (which === 'all' || which === 'wifi') {
+        pages += `<div class="print-page">${hdr}<h2>WiFi & Internet</h2>
+            <h3>Connecting to WiFi</h3>
+            <p>${D.wifi.description}</p><p>${D.wifi.details}</p>
+            <img src="${D.wifi.image}" alt="WiFi box">
+            <div class="print-info"><strong>Trouble with the Internet?</strong>${D.wifi.troubleshootText}</div>
+            <img src="${D.wifi.troubleshootImage}" alt="WiFi switch" style="max-height:180px">
+            ${ftr('WiFi & Internet')}
+        </div>`;
+    }
+
+    /* ── TV ── */
+    if (which === 'all' || which === 'tv') {
+        pages += `<div class="print-page">${hdr}<h2>TV & Radio</h2><h3>Watching TV Channels</h3>`;
+        D.tv.steps.forEach((s, i) => {
+            pages += `<div class="print-step"><div class="print-step-num">${i+1}</div><div class="print-step-text"><strong>${s.title}</strong><br>${s.text}</div></div>`;
+        });
+        pages += `<div class="print-warning"><strong>Troubleshooting</strong>${D.tv.troubleshoot}</div>
+            <h3>Radio</h3><p>${D.tv.radio.text}</p>
+            <p class="print-link">Video guide: ${D.tv.radio.videoUrl}</p>
+            ${ftr('TV & Radio')}
+        </div>`;
+    }
+
+    /* ── Heating ── */
+    if (which === 'all' || which === 'heating') {
+        pages += `<div class="print-page">${hdr}<h2>Heating & Climate</h2>`;
+        D.heating.forEach(h => {
+            pages += `<h3>${h.title}</h3><p>${h.text}</p>`;
+            if (h.image) pages += `<img src="${h.image}" alt="${h.title}" style="max-height:140px">`;
+            if (h.link) pages += `<p class="print-link">${h.linkLabel}: ${h.link}</p>`;
+        });
+        pages += `${ftr('Heating & Climate')}</div>`;
+    }
+
+    /* ── Water Heater ── */
+    if (which === 'all' || which === 'water') {
+        pages += `<div class="print-page">${hdr}<h2>Water Heater</h2>`;
+        D.waterHeater.steps.forEach((s, i) => {
+            pages += `<div class="print-step"><div class="print-step-num">${i+1}</div><div class="print-step-text"><strong>${s.title}</strong><br>${s.text}</div></div>`;
+        });
+        pages += `<img src="${D.waterHeater.image}" alt="Water heater">
+            <div class="print-info"><strong>Good to know</strong>${D.waterHeater.note}</div>
+            ${ftr('Water Heater')}
+        </div>`;
+    }
+
+    /* ── Kitchen ── */
+    if (which === 'all' || which === 'kitchen') {
+        pages += `<div class="print-page">${hdr}<h2>Kitchen</h2>`;
+        D.kitchen.forEach(k => {
+            pages += `<h3>${k.title}</h3><p>${k.text}</p>`;
+            if (k.image) pages += `<img src="${k.image}" alt="${k.title}" style="max-height:130px">`;
+            if (k.link) pages += `<p class="print-link">${k.linkLabel}: ${k.link}</p>`;
+        });
+        pages += `<h3>Using the Dishwasher</h3>`;
+        D.dishwasherSteps.forEach((s, i) => {
+            pages += `<div class="print-step"><div class="print-step-num">${i+1}</div><div class="print-step-text">${s}</div></div>`;
+        });
+        pages += `${ftr('Kitchen')}</div>`;
+    }
+
+    /* ── Emergency ── */
+    if (which === 'all' || which === 'emergency') {
+        pages += `<div class="print-page">${hdr}<h2>In Case of Emergency</h2>`;
+        D.emergency.forEach(e => {
+            pages += `<h3>${e.icon} ${e.title}</h3><p>${e.text}</p>`;
+            if (e.image) pages += `<img src="${e.image}" alt="${e.title}">`;
+            if (e.link) pages += `<p class="print-link">${e.linkLabel}: ${e.link}</p>`;
+        });
+        pages += `${ftr('Emergency')}</div>`;
+    }
+
+    /* ── Activities ── */
+    if (which === 'all' || which === 'activities') {
+        if (D.activities && D.activities.length) {
+            pages += `<div class="print-page">${hdr}<h2>Things to Do in the Area</h2>
+                <p>Hvide Sande and the surrounding West Coast offer plenty to explore.</p>`;
+            D.activities.forEach(a => {
+                pages += `<h3>${a.icon || ''} ${a.title}</h3><p>${a.text}</p>`;
+                if (a.link) pages += `<p class="print-link">${a.linkLabel || 'More Info'}: ${a.link}</p>`;
+            });
+            pages += `${ftr('Activities')}</div>`;
+        }
+    }
+
+    /* ── Checklist ── */
+    if (which === 'all' || which === 'checklist') {
+        pages += `<div class="print-page">${hdr}<h2>Leaving the House — Checklist</h2>
+            <p>Before you leave, please make sure you have completed the following:</p>
+            <ul class="print-checklist">`;
+        D.checklist.forEach(c => {
+            pages += `<li><span class="print-check-box"></span>${c}</li>`;
+        });
+        pages += `</ul>${ftr('Checklist')}</div>`;
+    }
+
+    document.getElementById('printContent').innerHTML = pages;
 }
 </script>
+
 </body>
 </html>
